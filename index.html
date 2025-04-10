@@ -1,13 +1,89 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LISTEN HARD</title>
+</head>
+
+<body style="padding:6px;">
+  <div style="display:flex;">
+    <!-- -->
+    <div style="overflow-y: scroll;height: 90dvh;width:50%;">
+      <table id="table">
+        <template id="table_row">
+          <tr>
+            <th>
+              </td>
+            <td><span></span><button></button></td>
+            <td><span></span><button></button></td>
+            <td><span></span><button></button></td>
+          </tr>
+        </template>
+      </table>
+    </div>
+    <!-- -->
+    <div>
+      <div>
+        <div id="drop_zone">
+          <p>Drag one or more files to this Drop Zone ...</p>
+        </div>
+        <div id="drop_zone2">
+          <p>Drag one or more files to this Drop Zone ...</p>
+        </div>
+      </div>
+
+      <div>
+        <button id="save">save</button>
+      </div>
+
+      <div style="height: 1.5em;"></div>
+
+      <div>
+        <button id="pprev">&laquo;</button>
+        <button id="prev">&lt;</button>
+        <button id="next">&gt;</button>
+        <button id="nnext">&raquo;</button>
+      </div>
+      <form id="word">
+        <span>No.</span>
+        <fieldset id="item_select" style="margin-inline:0;padding-block:0;padding-inline: 0;border:none;">
+          <input id="word_no" type="text" name="number" value="1" style="width:3rem;text-align: center;">
+          <input type="radio" id="word_en" value="0" name="part" checked>
+          <label for="word_en">en</label>
+          <input type="radio" id="word_ja" value="1" name="part">
+          <label for="word_ja">ja</label>
+          <input type="radio" id="word_ex" value="2" name="part">
+          <label for="word_ex">ex</label>
+        </fieldset>
+        <textarea style="display: block;" id="textinput" name="text"></textarea>
+      </form>
+      <div>
+        <!-- audio -->
+        <div>
+          <input type="text" form="word" name="audio_chunks" id="audio_chunks" value="0"
+            style="text-align: center;width:5em;">
+          <button id="playback">play</button>
+          <button id="playbackNext">play next</button>
+          <button id="append">append next</button>
+          <button id="skip">skip next</button>
+        </div>
+        <div>
+          <span id="playbackRate_value" style="display:inline-block;width:2em;text-align: center;"></span>
+          <input type="range" id="playbackRate" min="0.1" max="3.0" value="2.0" step="0.1" />
+          <span id="span">***</span>
+        </div>
+      </div>
+      <div>
+        <button id="submit" form="word" type="button">submit</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>
