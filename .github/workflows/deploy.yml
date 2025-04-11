@@ -8,8 +8,11 @@ jobs:
 
       - run: |
           echo "hello"
-          echo pwd
-          echo tree
+          pwd
+          tree
+          node --version
+          npm --version
+          npm install
       
       - uses: actions/upload-pages-artifact@v3
       
