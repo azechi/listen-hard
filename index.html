@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LISTEN HARD</title>
-    <!-- <link rel="stylesheet" href="./src/index.css" /> -->
+    <script type="module">
+      if (import.meta.env.PROD) {
+        navigator.serviceWorker.register("sw.js");
+      }
+    </script>    
     <script type="module" src="/src/my-element.ts"></script>
   </head>
   <body>
