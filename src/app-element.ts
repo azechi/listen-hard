@@ -1,13 +1,15 @@
-import { LitElement, css, html } from 'lit'
-import { customElement, state, query } from 'lit/decorators.js'
-import { until } from 'lit/directives/until.js';
+import { LitElement, TemplateResult, css, html } from 'lit'
+import { customElement, query, state } from 'lit/decorators.js'
+import { when} from 'lit/directives/when.js';
+
 
 import { appInit, deleteAudioSource, deleteCSVFile, importAudioSource, importCSVFile } from './app'
-import { when } from 'lit/directives/when.js';
-import { map } from 'lit/directives/map.js';
 
-import {Player} from './player'
+import { Player } from './player'
 
+import '@lit-labs/virtualizer';
+
+type Segment = [start: number, duration: number];
 
 declare global {
   interface HTMLElementTagNameMap {
@@ -28,14 +30,16 @@ export class AppElement extends LitElement {
   playbackRate = 1.5
 
   @state()
-  selectedSegment: [start: number, duration?: number] = [0, undefined];
+  selectedSegment: [start: number, duration?: number] = [0, undefined]
 
-  private chunks: [number, number][] = [[0, 1000], [1000, 1000], [2000, 1000], [3000, 1000], [4000, 1000], [5000, 1000], [6000, 1000], [7000, 1000], [8000, 1000], [9000, 1000], [10000, 1000]];
-
+  private segments: Segment[] = []
   private player = new Player()
 
   @state()
-  playing = false;
+  playing = false
+
+  @query("#playingDisplay", true)
+  playingDisplay!: HTMLSpanElement | null 
 
   constructor() {
     super();
@@ -44,53 +48,72 @@ export class AppElement extends LitElement {
     });
     this.player.addEventListener('playback-start', () => {
       this.playing = true;
+      const step = () => {
+        if (this.playing) {
+          this.playingDisplay!.innerText = this.player.currentTime.toFixed(2);
+        }
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
     });
+
     appInit.then((app) => {
       this.audioSrc = app.audio ?? '';
       this.csv = app.csv;
+
       this.player.setSource(this.audioSrc);
+
+      this.segments = this.csv!
+        .split("\r\n")
+        .slice(1, -1)
+        .map(line => line.split(",").map(Number)) as Segment[];
     });
   }
 
   render() {
-    return until(
-      appInit.then(
-        () => html`
-          <div style='color:${this.playing ? 'red' : 'black'};'>
-            <div>
-              <span style="display:inline-block;width:6em;">音源</span>
-              ${when(this.audioSrc,
-          () => html`<button @click=${async () => { await deleteAudioSource(this.audioSrc!); this.audioSrc = ''; }}>削除</button>`,
-          () => html`<button @click=${async () => this.audioSrc = await importAudioSource() ?? ''}>登録</button>`)}
-            </div>
-            <div>
-              <span style="display:inline-block;width:6em;">区間データ</span>
-              ${when(this.csv,
-            () => html`<button @click=${async () => { await deleteCSVFile(); this.csv = undefined; }}>削除</button>`,
-            () => html`<button @click=${async () => { this.csv = await importCSVFile() }}>登録</button>`)}
-            </div>
+    return html`
+      <div>
+        <div>
+          <span style="display:inline-block;width:6em;">音源</span>
+          ${when(this.audioSrc,
+      () => html`<button @click=${async () => { await deleteAudioSource(this.audioSrc!); this.audioSrc = ''; }}>削除</button>`,
+      () => html`<button @click=${async () => this.audioSrc = await importAudioSource() ?? ''}>登録</button>`)}
+        </div>
+        <div>
+          <span style="display:inline-block;width:6em;">区間データ</span>
+          ${when(this.csv,
+        () => html`<button @click=${async () => { await deleteCSVFile(); this.csv = undefined; }}>削除</button>`,
+        () => html`<button @click=${async () => { this.csv = await importCSVFile() }}>登録</button>`)}
+        </div>
+      </div>
 
-            <div>
-              <span id="playbackRate_value" style="display:inline-block;width:2em;text-align: center;">${this.playbackRate}</span>
-              <input type="range" @input=${(e: Event) => this.playbackRate = Number((e.currentTarget as HTMLInputElement).value)} min="0.1" max="3.0" value=${this.playbackRate} step="0.1" />
+      <div style=${'color:' + (this.playing ? 'red' : 'green')}>
+        <span>${(this.selectedSegment[0] / 1000).toFixed(2)}</span>
+        <span>${((this.selectedSegment[1] ?? 0) / 1000).toFixed(2)}</span>
+        <span id="playingDisplay"></span>
+      </div>
+
+      <div>
+        <span id="playbackRate_value" style="display:inline-block;width:2em;text-align: center;">${this.playbackRate}</span>
+        <input type="range" @input=${(e: Event) => this.playbackRate = Number((e.currentTarget as HTMLInputElement).value)} min="0.1" max="3.0" value=${this.playbackRate} step="0.1" />
+      </div>
+      
+      <lit-virtualizer
+        scroller
+        .items=${this.segments}
+        .renderItem=${([start, duration]: Segment, index: number): TemplateResult =>
+        html`
+            <div style="margin:0.5em;">
+              <button .index=${index} @click=${(e: unknown) => this.selectSegment(e)}>${index}  ${start}  ${duration}</button>
             </div>
-          </div>
-          <div>
-            <span>${this.selectedSegment[0]}</span>
-            <span>${this.selectedSegment[1]}</span>
-          </div>
-          
-          <div>
-            ${map(this.chunks, ([start,], idx) => html`<button style="display:block;margin: 6px;" @click=${this.selectChunk} .idx=${idx}>${start}</button>`)}
-          </div>
-        `),
-      html`<span>Loading...</span>`)
+          `}
+      ></lit-virtualizer>
+    `
   }
 
-  selectChunk(e: any) {
-    const idx = e.currentTarget.idx;
-    this.selectedSegment = this.chunks[idx];
-    
+  selectSegment(e: any) {
+    const idx = e.currentTarget.index;
+    this.selectedSegment = this.segments[idx];
     this.player.playback(...this.selectedSegment, this.playbackRate);
   }
 
@@ -104,5 +127,3 @@ export class AppElement extends LitElement {
     }
   `
 }
-
-

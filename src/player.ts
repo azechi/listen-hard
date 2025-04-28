@@ -16,12 +16,12 @@ export class Player extends EventTarget{
     return this.audio.currentTime;
   }
 
-  playback(start = 0, duration?: number, playbackRate = 1.0) {
-    const delay = Math.min(((duration ?? 2147483647) + 300) * 1 / playbackRate, 2147483647); // setTimeout delay max is 2147483647(int32.MAX).
+  playback(startMs = 0, durationMs = 2147483647, playbackRate = 1.0) {
+    const delay = Math.min((durationMs + 300) * 1 / playbackRate, 2147483647); // setTimeout delay max is 2147483647(int32.MAX).
 
     const audio = this.audio;
     audio.playbackRate = playbackRate;
-    audio.currentTime = (start / 1000); // - 0.2;
+    audio.currentTime = (startMs / 1000) - 0.2; 
 
     //console.log(start, audio.currentTime, audio.playbackRate, duration, delay);
 
