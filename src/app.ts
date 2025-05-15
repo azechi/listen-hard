@@ -1,78 +1,40 @@
 
+export type type = "e" | "j" | "x";
+export type Segment = [index: number, type: type,  start: number, duration: number];
 
-export const appInit = (async function appInit() {
-
-  const audio = await getAudioSource();
-  const csv = await getCSVFile()
-
-  // return new Promise<{audio:string, csv:string}>(resolve => {
-  //   setTimeout(()=> resolve({audio, csv}), 2000)
-  // });
-  return { audio, csv };
-})();
-
-async function getAudioSource() {
-  const file = await getFile("audio");
-  if (file == null) {
-    return undefined;
-  }
-  return URL.createObjectURL(file)
-}
-
-async function getCSVFile() {
-  const file = await getFile("csv");
-  if (file == null) {
-    return undefined;
-  }
-
-  const reader = new FileReader();
-  const {promise, resolve} = Promise.withResolvers();
-  reader.onload = resolve;
-  reader.readAsText(file);
-  await promise;
-  return reader.result as string;
-}
-
-/** Requires transient activation, otherwise a NotAllowedError will be thrown. */
-export async function importAudioSource() {
-
-  const file = await pickFile();
-
-  if (file != null) {
-    await saveFile(file, "audio");
-  }
-
-  return getAudioSource();
-}
-
-export async function deleteAudioSource(url: string) {
-  URL.revokeObjectURL(url)
-
-  const root = await navigator.storage.getDirectory();
-  await root.removeEntry("audio");
-}
-
-export async function deleteCSVFile() {
-  const root = await navigator.storage.getDirectory();
-  await root.removeEntry("csv");
-}
-
-/** Requires transient activation, otherwise a NotAllowedError will be thrown. */
-export async function importCSVFile() {
-
-  {
-    const file = await pickFile();
-
-    if (file != null) {
-      await saveFile(file, "csv");
+export function getSegments  () {
+  return new Promise<Segment[] | undefined>(resolve => {
+    const conn = window.indexedDB.open("db", 1);
+    conn.onupgradeneeded = e => {
+        const db = (<IDBOpenDBRequest>e.target).result;
+        db.createObjectStore("segments");
     }
-  }
 
-  return getCSVFile();
-  
+    conn.onsuccess = e => {
+        const db = (<IDBOpenDBRequest>e.target).result;
+        const tr = db.transaction("segments");
+        const tbl = tr.objectStore("segments");
+        tbl.get("value").onsuccess = e => {
+            const val = (<IDBRequest>e.target).result;
+            resolve(val);
+        }
+    }
+});
 }
 
-async function getFile(name: string) {
+/** Requires transient activation, otherwise a NotAllowedError will be thrown. */
+export async function downloadSegmentsCSV() {
+
+  const data = (await getSegments())??[];
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["startAt,duration,type,content\r\n", data.map(x => x.join(",")).join('\r\n')], { type: "text/csv" }));
+  a.download = "audio_segments.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+export async function getFile(name: string) {
   return navigator.storage.getDirectory()
     .then(dir => dir.getFileHandle(name))
     .then(hndl => hndl.getFile())
@@ -84,6 +46,34 @@ async function getFile(name: string) {
         throw e;
       });
 }
+
+export async function deleteFile(name: string) {
+  const root = await navigator.storage.getDirectory();
+  await root.removeEntry(name);
+}
+
+/** Requires transient activation, otherwise a NotAllowedError will be thrown. */
+export async function importFile(name: string) {
+  const file = await pickFile();
+
+  if (file != null) {
+    await saveFile(file, name);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 async function saveFile(file: File, name: string) {
 

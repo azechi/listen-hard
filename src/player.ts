@@ -7,8 +7,11 @@ export class Player extends EventTarget{
     super();    
   }
 
-  setSource(src: string) {
-    this.audio.src = src;
+  setSource(src: Blob = new Blob()) {
+    if (this.audio.src) {
+      URL.revokeObjectURL(this.audio.src);
+    }
+    this.audio.src = URL.createObjectURL(src);
     this.audio.load();
   }
 
@@ -32,7 +35,7 @@ export class Player extends EventTarget{
       clearTimeout(this.token);
     }, delay);
 
-    this.dispatchEvent(new CustomEvent('playback-start'));
+    this.dispatchEvent(new CustomEvent('playback-start', {detail: {startMs, durationMs, playbackRate}}));
     audio.play();
   }
 }

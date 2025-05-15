@@ -10,8 +10,8 @@
         navigator.serviceWorker.register("sw.js", {type:'module'});
       }
     </script>    
-    <script type="module" src="/src/app.ts"></script>
-    <script type="module" src="/src/app-element.ts"></script>
+    <script type="module" async src="/src/boot.ts"></script>
+    
     <style>
       div {
         background-color: rgba(185, 187, 159, 0.4);
@@ -19,7 +19,6 @@
     </style>
   </head>
   <body>
-    <app-element></app-element>
-  </div>
+    <!-- app-element -->
   </body>
 </html>

@@ -10,9 +10,11 @@ export default defineConfig({
         }
     },
     build: {
+        target: "esnext",
         rollupOptions: {
             input: {
                 app: "./index.html",
+                file: "./file.html",
                 sw: "./sw.ts",
             },
             output: {
