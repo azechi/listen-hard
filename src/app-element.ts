@@ -47,7 +47,7 @@ export class AppElement extends LitElement {
         .renderItem=${(segments: Segment[], index: number): TemplateResult =>
         // lit-virtualizerのイベントハンドラーのthisはlit-virtualizerなので、buttonのhostプロパティにapp-elementを設定している
         html`
-        <div style="margin:0.5em;">
+        <div style="padding-top:0.5rem;">
           <span style="display:inline-block;width:6em;text-align:center;">${segments[0][0]}</span>
           ${segments.map(([item_number, type, startMs, durationMs]) =>
           html`
