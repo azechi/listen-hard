@@ -1,24 +1,27 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:,">
-    <title>LISTEN HARD</title>
-    <script type="module">
-      if (import.meta.env.PROD) {
-        navigator.serviceWorker.register("sw.js", {type:'module'});
-      }
-    </script>    
-    <script type="module" async src="/src/boot.ts"></script>
-    
-    <style>
-      div {
-        background-color: rgba(185, 187, 159, 0.4);
-      }
-    </style>
-  </head>
-  <body>
-    <!-- app-element -->
-  </body>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="data:,">
+  <title>LISTEN HARD</title>
+  <script type="module">
+    if (import.meta.env.PROD) {
+      navigator.serviceWorker.register("sw.js", { type: 'module' });
+    }
+  </script>
+  <script type="module" async src="/src/boot.ts"></script>
+
+  <style>
+    div {
+      background-color: rgba(185, 187, 159, 0.4);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- app-element -->
+</body>
+
 </html>

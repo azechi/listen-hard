@@ -1,7 +1,7 @@
 import { LitElement, css, html, PropertyValues } from 'lit'
 import { customElement, property, query, state } from 'lit/decorators.js'
 
-import { Player } from './player';
+import { Player } from './lib/player';
 
 declare global {
   interface HTMLElementTagNameMap {

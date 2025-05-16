@@ -59,21 +59,11 @@ export class AppElement extends LitElement {
     `
   }
 
-  async randomPlayback2(){
-    const num = this.getRandomIntInclusive(1900, 1900);
-    this.list?.scrollToIndex(num - 1 - 2, 'start');
-    await this.updateComplete;
-
-    const btn = this.shadowRoot!.getElementById(`btn-${num}-e`)!;
-    btn.focus();
-    btn.click();
-  } 
-
-  async randomPlayback(){
+  async randomPlayback() {
     const num = this.getRandomIntInclusive(1, 1900);
     this.list?.scrollToIndex(num - 1 - 2, 'start');
     await this.updateComplete;
-
+    console.debug(`random playback num=${num}`)
     const btn = this.shadowRoot!.getElementById(`btn-${num}-e`)!;
     btn.focus();
     btn.click();

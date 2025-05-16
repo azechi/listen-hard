@@ -4,9 +4,9 @@ import * as app from './app';
 // type=moduleなscriptはDOMContentLoadedの直前のタイミング(DOMツリーは構築されている)で実行される
 // type=moduleはdefer=trueと同じタイミングで実行される
 // asyncはDOMツリーの構築を待たずにリソースが到着したらページロードをブロックして実行される
-console.info("boot.ts", document.readyState);
+console.debug("boot.ts", document.readyState);
 
-const [audio, segments, _] = await Promise.all([app.getFile('audio'), app.getSegments(), await import('./app-element')]);
+const [audio, segments, _] = await Promise.all([app.getAudioSrc(), app.getSegments(), await import('./app-element')]);
 
 
 if (audio == null || segments == null) {
@@ -15,7 +15,7 @@ if (audio == null || segments == null) {
 
 if (document.readyState == "loading") {
     document.addEventListener("DOMContentLoaded", () => {
-        console.info("DOMContentLoaded EventListener", document.readyState)
+        console.debug("DOMContentLoaded EventListener", document.readyState)
         start();
     }, { once: true });
 } else {

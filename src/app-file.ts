@@ -9,6 +9,8 @@ declare global {
   }
 }
 
+const initialState = await Promise.all([app.getAudioSrc(), app.getSegments()]);
+
 @customElement('app-file')
 export class AppFileElement extends LitElement {
 
@@ -16,15 +18,18 @@ export class AppFileElement extends LitElement {
   audioFileExists = false;
 
   @state()
-  segmentsFileExits = false;
+  segmentsDataExists = false;
 
   constructor() {
     super();
+
+    this.audioFileExists = initialState[0] != null;
+    this.segmentsDataExists = initialState[1] != null;
   }
 
-  async checkFileExists() {
-    this.audioFileExists = (await app.getFile("audio") != null);
-    this.segmentsFileExits = (await app.getFile("csv") != null);
+  private async checkResourceExists() {
+    this.audioFileExists = (await app.getAudioSrc() != null);
+    this.segmentsDataExists = (await app.getSegments() != null);
   }
 
   render() {
@@ -37,26 +42,26 @@ export class AppFileElement extends LitElement {
             <span style="display:inline-block;width:6em;">音源</span>
             ${this.audioFileExists
         ? html`<button @click=${async () => {
-          await app.deleteFile("audio");
-          await this.checkFileExists();
+          await app.deleteAudioSrc();
+          await this.checkResourceExists();
         }}>削除</button>`
         : html`<button @click=${async () => {
-          await app.importFile("audio");
-          await this.checkFileExists();
+          await app.importAudioSrc();
+          await this.checkResourceExists();
         }}>登録</button>`}
           </div>
         </div>
         <div>
           <div>
             <span style="display:inline-block;width:6em;">区間CSV</span>
-            ${this.segmentsFileExits
+            ${this.segmentsDataExists
         ? html`<button @click=${async () => {
-          await app.deleteFile("csv");
-          await this.checkFileExists();
+          await app.deleteSegments();
+          await this.checkResourceExists();
         }}>削除</button><button @click=${app.downloadSegmentsCSV}>ダウンロード</button>`
         : html`<button @click=${async () => {
-          await app.importFile("csv");
-          await this.checkFileExists();
+          await app.importSegmentsCSV();
+          await this.checkResourceExists();
         }}>登録</button>`}
           </div>
         </div>
