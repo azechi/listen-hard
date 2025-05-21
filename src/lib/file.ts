@@ -17,18 +17,26 @@ export async function deleteFile(name: string) {
   await root.removeEntry(name);
 }
 
-/** Requires transient activation, otherwise a NotAllowedError will be thrown. */
-export async function importFile(name: string) {
-  const file = await pickFile();
+export async function saveFile(file: File, name: string) {
 
-  if (file != null) {
-    await saveFile(file, name);
+  // safariでのOPFSの書き込みはworkerでcreateSyncAccessHandleを使う必要がある
+  // さらに、safariはReadbleStreamはTransferableではない
+  if (FileSystemFileHandle.prototype.createWritable === undefined) {
+    const w = new Worker(new URL('./file.worker.ts', import.meta.url), { type: 'module' });
+    const { port1, port2 } = new MessageChannel();
+    w.postMessage([name, port2], [port2]);
+
+    file.stream().pipeTo(new WritableStream({
+      write(chunk) {
+        port1.postMessage(chunk, [chunk.buffer]);
+      },
+      close() {
+        port1.postMessage('EOF');
+      }
+    }));
+
+    return;
   }
-}
-
-async function saveFile(file: File, name: string) {
-
-  // iso safariはworkerを使う必要があるまだ実装していない
 
   const root = await navigator.storage.getDirectory();
   const hndl = await root.getFileHandle(name, { create: true });
@@ -38,7 +46,7 @@ async function saveFile(file: File, name: string) {
 
 
 /** Requires transient activation, otherwise a NotAllowedError will be thrown. */
-function pickFile() {
+export function pickFile() {
   return ('showOpenFilePicker' in window)
     ? pickFile_showOpenFilePicker()
     : pickFile_inputElementPicker()
@@ -87,7 +95,8 @@ function pickFile_inputElementPicker() {
       resolve(file);
     })
 
-    el.showPicker();
+    //el.showPicker();
+    el.click();
   });
 }
 

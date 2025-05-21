@@ -1,5 +1,5 @@
 import * as db from './lib/db.ts';
-import * as file from './lib/file.ts';
+import * as fs from './lib/file.ts';
 
 export type type = "e" | "j" | "x";
 export type Segment = [index: number, type: type, start: number, duration: number];
@@ -18,11 +18,27 @@ export function getSegments() {
 }
 
 export function deleteSegments() {
-  // TODO
+  db.remove(database, 'segments', 'value');
 }
 
-export function importSegmentsCSV() {
-  // TODO
+/** Requires transient activation, otherwise a NotAllowedError will be thrown. */
+export async function importSegmentsCSV() {
+  const file = await fs.pickFile();
+
+  if (file == null) {
+    return;
+  }
+
+  const reader = new FileReader();
+  await new Promise(resolve => {
+    reader.onload = resolve;
+    reader.readAsText(file, 'utf-8');
+  });
+
+  const text = reader.result! as string;
+  const segments = text.split('\r\n').slice(1).map(l => [...l.split(',').map((v,i)=> i == 1? JSON.parse(v): Number(v))])
+  
+  await db.put(database, 'segments', segments, 'value');
 }
 
 /** Requires transient activation, otherwise a NotAllowedError will be thrown. */
@@ -40,15 +56,22 @@ export async function downloadSegmentsCSV() {
 // file
 const AUDIOFILENAME = 'audio';
 
-export function getAudioSrc() {
-  return file.getFile(AUDIOFILENAME);
+export async function getAudioSrc() {
+  // TODO とりあえず mp3で決め打ち
+  // iOSではBlobにmimetypeが無いとaudioの再生ができない
+  const file = await fs.getFile(AUDIOFILENAME);
+  return file != null? new Blob([file], {type:'audio/mpeg'}): file;
 }
 
 export function deleteAudioSrc() {
-  return file.deleteFile(AUDIOFILENAME);
+  return fs.deleteFile(AUDIOFILENAME);
 }
 
 /** Requires transient activation, otherwise a NotAllowedError will be thrown. */
-export function importAudioSrc() {
-  return file.importFile(AUDIOFILENAME);
+export async function importAudioSrc() {
+  const file = await fs.pickFile();
+
+  if (file != null) {
+    await fs.saveFile(file, AUDIOFILENAME);
+  }
 }

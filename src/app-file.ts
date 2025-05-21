@@ -32,6 +32,10 @@ export class AppFileElement extends LitElement {
     this.segmentsDataExists = (await app.getSegments() != null);
   }
 
+  importCSV() {
+    return app.importSegmentsCSV();
+  }
+
   render() {
     console.log("render", this.audioFileExists)
     return html`
