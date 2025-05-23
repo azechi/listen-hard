@@ -8,7 +8,8 @@
   <title>LISTEN HARD</title>
   <script async type="module">
     if (import.meta.env.PROD) {
-      navigator.serviceWorker.register("sw.js", { type: 'module' });
+      navigator.serviceWorker.register("sw.js", { type: 'module' })
+      .then(reg => reg.update());
     }
   </script>
   <script type="module" async src="/src/boot.ts"></script>
