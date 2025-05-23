@@ -1,5 +1,8 @@
 export class Player extends EventTarget{
 
+  // setTimeout delay max is 2147483647(int32.MAX).
+  static INT32_MAX = 2147483647;
+
   private readonly audio = new Audio();
   private token?: number;
 
@@ -19,21 +22,17 @@ export class Player extends EventTarget{
     return this.audio.currentTime;
   }
 
-  playback(startMs = 0, durationMs = 2147483647, playbackRate = 1.0) {
-    const delay = Math.min((durationMs + 800) * 1 / playbackRate, 2147483647); // setTimeout delay max is 2147483647(int32.MAX).
-
+  playback(startMs = 0, durationMs = Player.INT32_MAX, playbackRate = 1.0) {
     const audio = this.audio;
     audio.playbackRate = playbackRate;
     audio.currentTime = (startMs / 1000); 
-
-    //console.log(start, audio.currentTime, audio.playbackRate, duration, delay);
 
     clearTimeout(this.token);
     this.token = setTimeout(() => {
       this.dispatchEvent(new CustomEvent('playback-complete'));
       audio.pause();
       clearTimeout(this.token);
-    }, delay);
+    }, durationMs);
 
     this.dispatchEvent(new CustomEvent('playback-start', {detail: {startMs, durationMs, playbackRate}}));
     audio.play();

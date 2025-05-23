@@ -29,8 +29,15 @@ export class AppPlayerElement extends LitElement {
   @query("#playing-display", true)
   playingDisplay!: HTMLSpanElement | null
 
+  // 補正値
+  left = 300;
+  right = 300;
+
   playback(startMs = 0, durationMs = 2147483647) {
-    this.player.playback(startMs, durationMs, this.playbackRate);
+    const startMs2 = Math.max(startMs - this.left, 0);
+    const durationMs2 = Math.min((durationMs + this.right) * 1 / this.playbackRate, Player.INT32_MAX); 
+    
+    this.player.playback(startMs2, durationMs2, this.playbackRate);
   }
 
   protected willUpdate(changedProperties: PropertyValues): void {
