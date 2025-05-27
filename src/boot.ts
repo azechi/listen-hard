@@ -5,7 +5,7 @@
 // asyncはDOMツリーの構築を待たずにリソースが到着したらページロードをブロックして実行される
 console.debug("boot.ts", document.readyState);
 
-navigator.serviceWorker.register("sw.js", { type: 'module' }) // scopeは指定していないので、sw.jsのあるフォルダになる 文字列'https://example.com/' ルートディレクトリの末尾のスラッシュ付き
+navigator.serviceWorker.register("./sw.js", { type: 'module' }) // scopeは指定していないので、sw.jsのあるフォルダになる。末尾のスラッシュ付き
     .then(reg => {
         // もしキャッシュがあればリクエストされない、ただしキャッシュが有効なのは最大で24時間まで(chromeの場合)
         reg.update() // 戻り値は呼び出したのと同じServiceWorkerRegistrationのPromiseか

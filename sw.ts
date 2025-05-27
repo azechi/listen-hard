@@ -4,6 +4,9 @@
 export type { };
 declare const self: ServiceWorkerGlobalScope;
 
+
+const targetPathnames = ["./", "./index", "./index.html"].map(s => new URL(s, self.registration.scope).pathname);
+
 self.addEventListener("install", event =>{
     event.waitUntil(self.skipWaiting());
 });
@@ -22,7 +25,7 @@ self.addEventListener("fetch", event => {
     // http, httpsのpathnameは決して空文字列にはならない (file://も)
     // https://developer.mozilla.org/ja/docs/Web/API/URL/pathname
     const path = new URL(req.url).pathname;
-    if (["/", "/index", "/index.html"].includes(path)) {
+    if (targetPathnames.includes(path)) {
         event.respondWith((async () => {
             const res = await fetch(req);
             return new Response(res.body, {
