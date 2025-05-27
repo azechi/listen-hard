@@ -37,7 +37,6 @@ export class AppFileElement extends LitElement {
   }
 
   render() {
-    console.log("render", this.audioFileExists)
     return html`
       <div>
         <span>ここでファイルの登録をしてね</span>

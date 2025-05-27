@@ -7,6 +7,8 @@ import type { Segment } from './app';
 import { AppPlayerElement } from './app-player';
 import { LitVirtualizer } from '@lit-labs/virtualizer';
 
+import { fileDialog } from './file-dialog';
+
 declare global {
   interface HTMLElementTagNameMap {
     'app-element': AppElement
@@ -32,9 +34,7 @@ export class AppElement extends LitElement {
 
   render() {
     return html`
-      <div>
-        <a href="file.html">FILE</a>
-      </div>
+      ${fileDialog()}
 
       <app-player .src=${this._audioSrc}></app-player>
 
