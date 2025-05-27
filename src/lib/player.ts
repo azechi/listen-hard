@@ -1,4 +1,4 @@
-export class Player extends EventTarget{
+export class Player extends EventTarget {
 
   // setTimeout delay max is 2147483647(int32.MAX).
   static INT32_MAX = 2147483647;
@@ -7,7 +7,7 @@ export class Player extends EventTarget{
   private token?: number;
 
   constructor() {
-    super();    
+    super();
   }
 
   setSource(src: Blob = new Blob()) {
@@ -25,7 +25,7 @@ export class Player extends EventTarget{
   playback(startMs = 0, durationMs = Player.INT32_MAX, playbackRate = 1.0) {
     const audio = this.audio;
     audio.playbackRate = playbackRate;
-    audio.currentTime = (startMs / 1000); 
+    audio.currentTime = (startMs / 1000);
 
     clearTimeout(this.token);
     this.token = setTimeout(() => {
@@ -34,7 +34,7 @@ export class Player extends EventTarget{
       clearTimeout(this.token);
     }, durationMs);
 
-    this.dispatchEvent(new CustomEvent('playback-start', {detail: {startMs, durationMs, playbackRate}}));
+    this.dispatchEvent(new CustomEvent('playback-start', { detail: { startMs, durationMs, playbackRate } }));
     audio.play();
   }
 }
