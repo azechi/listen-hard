@@ -95,6 +95,7 @@ function pickFile_inputElementPicker() {
       resolve(file);
     })
 
+    // iOS 15.8.4ではtype=fileのshowPickerは無い
     //el.showPicker();
     el.click();
   });

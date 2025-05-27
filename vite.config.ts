@@ -2,23 +2,16 @@ import { defineConfig } from 'vite'
 
 export default defineConfig(({ mode }) => {
 
-    const headers = mode == "development" ? {
-        "Cross-Origin-Embedder-Policy": "require-corp",
-        "Cross-Origin-Opener-Policy": "same-origin",
-    } : {};
-
     return {
         base: "",
         server: {
             allowedHosts: true,
-            headers
         },
         build: {
             target: "esnext",
             rollupOptions: {
                 input: {
                     app: "./index.html",
-                    file: "./file.html",
                     sw: "./sw.ts",
                 },
                 output: {
@@ -28,6 +21,7 @@ export default defineConfig(({ mode }) => {
                 },
             },
         },
+
         plugins: [{
             name: 'accesslog',
             configureServer(server) {
@@ -37,7 +31,7 @@ export default defineConfig(({ mode }) => {
                         //console.log(res.getHeaders());
                     });
                     next();
-                    
+
                 });
             },
             configurePreviewServer(server) {
@@ -47,10 +41,9 @@ export default defineConfig(({ mode }) => {
                         //console.log(res.getHeaders());
                     });
                     next();
-                    
+
                 });
             },
-        }
-        ]
+        }]
     }
 })
