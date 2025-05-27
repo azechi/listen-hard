@@ -4,8 +4,8 @@
 export type { };
 declare const self: ServiceWorkerGlobalScope;
 
-
-const targetPathnames = ["./", "./index", "./index.html"].map(s => new URL(s, self.registration.scope).pathname);
+const targetPathnames = new URL(self.location.href).searchParams.getAll('targetPathname').map(s => new URL(s, self.registration.scope).pathname);
+console.debug(`target Pathnames ${targetPathnames}`)
 
 self.addEventListener("install", event =>{
     event.waitUntil(self.skipWaiting());
