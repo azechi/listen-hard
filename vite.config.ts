@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
         server: {
             allowedHosts: true,
         },
+        appType: "mpa",
         build: {
             target: "esnext",
             rollupOptions: {
