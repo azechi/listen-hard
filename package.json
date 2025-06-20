@@ -11,7 +11,6 @@
   "dependencies": {
     "@lit-labs/virtualizer": "^2.1.0",
     "@lit/task": "^1.0.2",
-    "@tanstack/lit-virtual": "^3.13.6",
     "lit": "^3.2.1"
   },
   "devDependencies": {
